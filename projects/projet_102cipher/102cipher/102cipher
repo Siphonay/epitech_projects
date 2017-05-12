@@ -1,0 +1,137 @@
+#!/usr/bin/env ruby
+# coding: utf-8
+
+# ALEXIS "SAM" VIGUIÉ <alexis.viguie@epitech.eu>
+# Project "102cipher"
+# No license applied. I am not liable of anything concerning your use of this code.
+# Started       23-11-2015 18:31
+# Last updated  25-11-2015 16:44
+
+# The subject requires that an exit resulting from an error must return the error code 84.
+def abort_84(str)
+  $stderr.puts str
+  exit 84
+end
+
+# The following part of the code is used to check that the entered parameters are correct.
+abort_84 "usage: #{$PROGRAM_NAME} message key flag" unless ARGV.length == 3
+
+case ARGV[2]
+when "0"                                                # Encryption flag
+  msg_arr = ARGV[0].bytes                               # The characters of the massage are required to be converted into each of their ASCII identifier in order to be converted.
+  key_arr = ARGV[1].bytes
+when "1"                                                # Decryption flag
+  msg_arr = ARGV[0].split(" ").map { |s| s.to_i }       # As the message passed in parameter is ciphered, it is formatted as a series of number separated with spaces. So, I convert it as an array of ints.
+  key_arr = ARGV[1].bytes
+else
+  abort_84 "error: invalid flag"
+end
+
+# Defining the size of the future matrices (three-dimensional arrays, in this program).
+mtx_size = 1
+mtx_size += 1 until mtx_size ** 2 >= key_arr.length
+msg_mtx_row = 1
+msg_mtx_row += 1 until msg_mtx_row * mtx_size >= msg_arr.length
+
+# The following method is building a matrix of the size of the parameters passed from an array, as its prototype hints.
+def build_mtx(array, rows_number, columns_number)
+  mtx = Array.new(rows_number) {Array.new(columns_number, 0)}                           # Unused matrices positions are filled with zeroes.
+  array_position = 0
+
+  (0..rows_number - 1).each do |row_i|
+    (0..columns_number - 1).each do |column_i|
+      mtx[row_i][column_i] = array[array_position] if array_position < array.length     # Keep zeroes untouched
+      array_position += 1
+    end
+  end
+
+  return mtx
+end
+
+def mtx_determinant(mtx, mtx_size)
+  case mtx_size
+  when 1
+    det = mtx[0][0]
+  when 2
+    det = mtx[0][0] * mtx[1][1] - mtx[1][0] * mtx[0][1]
+  else
+    det = 0
+    
+    for j_1 in (0...mtx_size)
+      mtx_slice = Array.new(mtx_size - 1) { Array.new(mtx_size - 1) }
+      for counter in (1...mtx_size)
+        j_2 = 0
+        for counter_2 in (0...mtx_size)
+          unless counter_2 == j_1
+            mtx_slice[counter - 1][j_2] = mtx[counter][counter_2]
+            j_2 += 1
+          end
+        end
+      end
+      
+      det += (-1 ** j_1 + 2) * mtx[0][j_1] * (mtx_determinant mtx_slice, mtx_size - 1)
+    end
+  end
+  
+  return det
+end
+
+# Building matrices
+msg_mtx = build_mtx(msg_arr, msg_mtx_row, mtx_size)
+key_mtx = build_mtx(key_arr, mtx_size, mtx_size)        # The key matrix has to be square so it could be inverted in case of decryption.
+# Starting the output part
+puts "Key matrix :"
+
+# This method is used to print strings without a final nextline and flushes the output to keep it synchronized.
+def print_and_flush(str)
+  print str
+  $stdout.flush
+end
+
+# Formatted print of the key matrix
+key_mtx.each do |row_i|
+  (0..row_i.length - 1).each do |i|
+    print_and_flush "#{row_i[i]}"
+    print_and_flush "\t" if row_i[i + 1]        # Does not print a tabulation at the end of the line for cleaner output.
+  end
+  print_and_flush "\n"
+end
+
+# This part is to create the encrypted or decrypted matrix
+res_mtx = msg_mtx.map { |msg_c| msg_c.map { |c| 0 } }                                   # Creating a new empty matrix of the same size of the message to contain its encrypted or decrypted content
+
+# Algorithm to calculate the resulting matrix that multiplies each of the message's row by each of the key's columns
+(0..msg_mtx.length - 1).each do |i|
+  (0..msg_mtx[i].length - 1).each do |j|
+    value = 0
+    (0..key_mtx.length - 1).each { |k| value = value + msg_mtx[i][k] * key_mtx[k][j] }
+    res_mtx[i][j] = value
+  end
+end
+
+# Now printing the result
+operation = if ARGV[2] == "0"   # Deciding of the name of the operation to display
+              "Encrypted"
+            else
+              "Decrypted"
+
+            end
+
+puts "\n#{operation} message :"
+
+# Display every element of the matrix following each other
+(0..res_mtx.length - 1).each do |i|
+  (0..res_mtx[i].length - 1).each do |j|
+    if ARGV[2] == "0"
+      print_and_flush res_mtx[i][j]
+    else
+      print_and_flush res_mtx[i][j].to_i.chr    # In case of a decryption, print a character
+    end
+    
+    if res_mtx[i + 1] || res_mtx[i][j + 1]      # Separates the elements with a space in case of an encryption, and prints a newline at the end of the matrix
+      print_and_flush " " if ARGV[2] == "0"
+    else
+      print_and_flush "\n"
+    end
+  end
+end

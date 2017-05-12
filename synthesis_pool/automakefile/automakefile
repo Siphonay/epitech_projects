@@ -1,0 +1,102 @@
+#!/bin/bash
+## automakefile for automakefile in /home/sam/Rendu/Piscine_S/automakefile
+## 
+## Made by Alexis Viguié
+## Login   <sam@epitech.net>
+## 
+## Started on  Mon Jun 27 10:37:02 2016 Alexis Viguié
+## Last update Wed Jun 29 10:55:41 2016 Alexis Viguié
+##
+
+if [[ "$#" -ne 1 || -z $1 ]]
+then
+    (>&2 echo "automakefile: invalid arguments")
+    exit 84
+fi
+
+if [[ ! -f $1 || ! -s $1 ]]
+then
+    (>&2 echo "automakefile: file $1 not found, not readable or is a directory")
+    exit 84
+fi
+
+PROJECT_DIR=$(grep -e "^PROJECT_DIR;" $1 | cut -d ';' -f 2)
+SOURCES_DIR=$(grep -e "^SOURCES_DIR;" $1 | cut -d ';' -f 2)
+if [[ ! -z $SOURCES_DIR ]]
+then
+    SOURCES_DIR=$SOURCES_DIR/
+fi
+HEADERS_DIR=$(grep -e "^HEADERS_DIR;" $1 | cut -d ';' -f 2)
+if [[ ! -z $HEADERS_DIR ]]
+then
+    HEADERS_DIR=$HEADERS_DIR/
+fi
+LIBS_DIR=$(grep -e "^LIBS_DIR;" $1 | cut -d ';' -f 2)
+EXEC=$(grep -e "^EXEC;" $1 | cut -d ';' -f 2)
+CC=$(grep -e "^CC;" $1 | cut -d ';' -f 2)
+CFLAGS=$(grep -e "^CFLAGS;" $1 | cut -d ';' -f 2)
+LDFLAGS=$(grep -e "^LDFLAGS;" $1 | cut -d ';' -f 2)
+AM_SOURCES=$(grep -e "^.*\.c;" $1 | cut -d ';' -f 1 | sed -e "s/^/\$(SOURCES_DIR)/" | tr "\n" " ")
+
+BKP_DIR=$(grep -e "^BKP_DIR;" $1 | cut -d ';' -f 2)
+if [[ ! -z $BKP_DIR ]]
+then
+    BKP_DIR=$BKP_DIR/
+fi
+ZIP=$(grep -e "^ZIP;" $1 | cut -d ';' -f 2)
+ZIPFLAGS=$(grep -e "^ZIPFLAGS;" $1 | cut -d ';' -f 2)
+UNZIP=$(grep -e "^UNZIP;" $1 | cut -d ';' -f 2)
+UNZIPFLAGS=$(grep -e "^UNZIPFLAGS;" $1 | cut -d ';' -f 2)
+
+echo -e "CC=\t$CC" > $PROJECT_DIR/Makefile
+echo -e "RM=\trm -f" >> $PROJECT_DIR/Makefile
+echo -e "ZIP=\t$ZIP" >> $PROJECT_DIR/Makefile
+echo -e "UNZIP=\t$UNZIP" >> $PROJECT_DIR/Makefile
+echo -e "MKDIR=\tmkdir -p" >> $PROJECT_DIR/Makefile
+echo -e "BKP_DIR=\t$BKP_DIR" >> $PROJECT_DIR/Makefile
+echo -e "SOURCES_DIR=\t$SOURCES_DIR" >> $PROJECT_DIR/Makefile
+if [[ ! -z $HEADERS_DIR ]]
+then
+    echo -e "CFLAGS+=\t-I$HEADERS_DIR" >> $PROJECT_DIR/Makefile
+fi
+echo -e "CFLAGS+=\t$CFLAGS" >> $PROJECT_DIR/Makefile
+echo -e "LDFLAGS=\t$LDFLAGS" >> $PROJECT_DIR/Makefile
+echo -e "ZIPFLAGS=\t$ZIPFLAGS" >> $PROJECT_DIR/Makefile
+echo -e "UNZIPFLAGS=\t$UNZIPFLAGS" >> $PROJECT_DIR/Makefile
+echo -e "SRC=\t$AM_SOURCES" >> $PROJECT_DIR/Makefile
+echo -e "OBJ=\t\$(SRC:.c=.o)" >> $PROJECT_DIR/Makefile
+echo -e "NAME=\t$EXEC" >> $PROJECT_DIR/Makefile
+echo -e "all:\t\$(NAME)" >> $PROJECT_DIR/Makefile
+echo -e "\$(NAME):\t\$(OBJ)" >> $PROJECT_DIR/Makefile
+echo -e "\t\$(CC) \$(OBJ) -o \$(NAME) \$(CFLAGS)" >> $PROJECT_DIR/Makefile
+echo -e "clean:\t" >> $PROJECT_DIR/Makefile
+echo -e "\t\$(RM) \$(OBJ)" >> $PROJECT_DIR/Makefile
+echo -e "fclean:\tclean" >> $PROJECT_DIR/Makefile
+echo -e "\t\$(RM) \$(NAME)" >> $PROJECT_DIR/Makefile
+echo -e "re:\tfclean all" >> $PROJECT_DIR/Makefile
+echo -e "archive:" >> $PROJECT_DIR/Makefile
+echo -e "ifeq (\$(wildcard \$(BKP_DIR)/.),)" >> $PROJECT_DIR/Makefile
+echo -e "\t\$(MKDIR) \$(BKP_DIR)" >> $PROJECT_DIR/Makefile
+echo -e "endif" >> $PROJECT_DIR/Makefile
+echo -e "ifneq (\$(SRC),)" >> $PROJECT_DIR/Makefile
+echo -e "\t\$(ZIP) \$(ZIPFLAGS) \$(BKP_DIR)\$(NAME).tar \$(SRC)" >> $PROJECT_DIR/Makefile
+echo -e "\t@echo \"\$(NAME).tar file generated.\"" >> $PROJECT_DIR/Makefile
+echo -e "ifeq (\$(wildcard .proj_version),)" >> $PROJECT_DIR/Makefile
+echo -e "\t@echo 1 > .proj_version" >> $PROJECT_DIR/Makefile
+echo -e "else" >> $PROJECT_DIR/Makefile
+echo -e "\t@expr \`cat .proj_version\` + 1 > .proj_version" >> $PROJECT_DIR/Makefile
+echo -e "endif" >> $PROJECT_DIR/Makefile
+echo -e "endif" >> $PROJECT_DIR/Makefile
+echo -e "revert:" >> $PROJECT_DIR/Makefile
+echo -e "ifneq (\$(wildcard \$(BKP_DIR)\$(NAME).tar),)" >> $PROJECT_DIR/Makefile
+echo -e "\t\$(UNZIP) \$(UNZIPFLAGS) \$(BKP_DIR)\$(NAME).tar" >> $PROJECT_DIR/Makefile
+echo -e "endif" >> $PROJECT_DIR/Makefile
+echo -e "num:" >> $PROJECT_DIR/Makefile
+echo -e "ifneq (\$(wildcard .proj_version),)" >> $PROJECT_DIR/Makefile
+echo -e "\t@echo Version \`cat .proj_version\`" >> $PROJECT_DIR/Makefile
+echo -e "else" >> $PROJECT_DIR/Makefile
+echo -e "\t@echo 0" >> $PROJECT_DIR/Makefile
+echo -e "endif" >> $PROJECT_DIR/Makefile
+echo -e "delete:" >> $PROJECT_DIR/Makefile
+echo -e "\t\$(RM) \$(BKP_DIR)\$(NAME).tar" >> $PROJECT_DIR/Makefile
+echo -e ".PHONY:\tall clean fclean re archive revert num delete" >> $PROJECT_DIR/Makefile

@@ -1,0 +1,94 @@
+body {
+    background: black
+}
+
+h1 {
+    color: red;
+    font-size: 10px;
+    font-family: "Comic Sans MS";
+    text-align: center;
+}
+
+h2 {
+    color: orange;
+    font-size: 14px;
+    font-family: "Comic Sans MS";
+    text-align: center;
+}
+
+h3 {
+    color: yellow;
+    font-size: 18px;
+    font-family: "Comic Sans MS";
+    text-align: center;
+}
+
+h4 {
+    color: green;
+    font-size: 22px;
+    font-family: "Comic Sans MS";
+    text-align: center;
+}
+
+h5 {
+    color: blue;
+    font-size: 26px;
+    font-family: "Comic Sans MS";
+    text-align: center;
+}
+
+h6 {
+    color: purple;
+    font-size: 30px;
+    font-weight: bold;
+    font-family: "Comic Sans MS";
+    text-align: center;
+}
+
+p {
+    background-image: -webkit-gradient( linear, left top, right top, color-stop(0, #f22), color-stop(0.15, #f2f), color-stop(0.3, #22f), color-stop(0.45, #2ff), color-stop(0.6, #2f2),color-stop(0.75, #2f2), color-stop(0.9, #ff2), color-stop(1, #f22) );
+    background-image: gradient( linear, left top, right top, color-stop(0, #f22), color-stop(0.15, #f2f), color-stop(0.3, #22f), color-stop(0.45, #2ff), color-stop(0.6, #2f2),color-stop(0.75, #2f2), color-stop(0.9, #ff2), color-stop(1, #f22) );
+    color:transparent;
+    -webkit-background-clip: text;
+    background-clip: text;
+    font-size: 21px;
+    font-family: "TeX Gyre Adventor";
+    font-weight: bold;
+    text-align: justify;
+}
+
+a {
+    text-decoration: none;
+    font-family: "TeX Gyre Cursor";
+    color: white;
+    font-size: 29px;
+}
+
+a:hover {
+    -webkit-animation: color-change 1s infinite;
+    animation: color-change 1s infinite;
+}
+
+@-webkit-keyframes {
+    0% { color: red; }
+    50% { color: blue; }
+    100% { color: red; }
+}
+
+@keyframes color-change {
+    0% { color: red; }
+    50% { color: blue; }
+    100% { color: red; }
+}
+
+img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+ul {
+    color: orange;
+    font-size: 16px;
+    font-family: "Roboto Condensed";
+}

@@ -1,0 +1,10 @@
+-help			Afficher cette aide
+-l --level={num}	Démarrer Tetris au niveau num
+-kl --key-left={K}	Bouger un tetrimino sur la GAUCHE avec la touche K
+-kr --key-right={K}	Bouger un tetrimino sur la DROITE avec la touche K
+-kt --key-turn={K}	Faire effectuer une rotation au tetrimino avec la touche K
+-kd --key-drop={K}	Faire chuter un tetrimino avec la touche K
+-kp --key-pause={K}	Activer et désactiver la pause avec la touche K
+--map-size={row,col}	Régler la taille du jeu à row, col
+-w --without-next	Cacher le tetrimino suivant
+-d --debug		Mode de débogage

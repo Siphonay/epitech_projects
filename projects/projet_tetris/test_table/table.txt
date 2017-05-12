@@ -1,0 +1,20 @@
+TETRIS		│          
+		│          
+High score	│          
+XXX  		│          
+Score		│          
+XXX		│          
+		│          
+Lines		│          
+XX		│          
+Level		│          
+XX		│          
+		│          
+Timer		│          
+XX		│          
+		│          
+─Next───────────┤          
+	  	│          
+**	   	│          
+ **		│          
+		│          

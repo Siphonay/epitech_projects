@@ -1,0 +1,105 @@
+#!/usr/bin/env ruby
+# coding: utf-8
+
+# PROJECT 103architech
+# TEAM "2 GUYS 1 PROJECT"
+# ALEXIS "SAM" VIGUIÉ <alexis.viguie@epitech.eu
+# ALEXANDRE "KARIBOU" LARONCE <alexandre.laronce@epitech.eu>
+# No license applied. We are not liable in any way from anything caused by any possible use of the following code.
+# Started       07-12-2015 17h42
+# Last updated  09-12-2015 14h47
+
+### THIS IS A WORK IN PROGRESS ###
+
+# Including external methods
+require_relative 'print_and_flush'      # This method is for printing without a newline
+require_relative 'abort_84'             # This method is for exiting the program with the return value "84" in case of error, as stated by the subject
+
+# This next part verifies the validity of the arguments passed and stores them to be used in the script
+abort_84 "usage: #{$PROGRAM_NAME} x y transfo1 arg11 [arg12] [transfo2 arg12 [arg22]]" if ARGV.length < 3       # Checking the validity of the number of arguments passed
+
+abort_84 "error: invalid coordinates" unless ((ARGV[0].to_i != 0 ||                                             # Checking if the coordinates arguments are valid
+                                               ARGV[0][0] == '0') &&
+                                              (ARGV[1].to_i != 0 ||
+                                               ARGV[1][0] == '0'))
+
+def build_oplist(argpos, oplist)                                                                                # This recursive method checks the validity of the flags and their arguments and builds a list of operations
+  valid_args = ["-t", "-h", "-r", "-s"]
+  abort_84 "error: invalid flag" unless valid_args.include? ARGV[argpos]                                        # Checking if the flag is valid
+  curr_op = Array.new                                                                                           # Creating an array to be pushed into the operations array
+  curr_op.push(ARGV[argpos])                                                                                    # Adding the operation type to the current operation array
+  
+  if (ARGV[argpos] == "-t" || ARGV[argpos] == "-h")
+    abort_84 "error: invalid flag argumets" unless ((ARGV[argpos + 1] &&
+                                                     ((ARGV[argpos + 1].to_i != 0) ||                           # Those conditions are used to check the existence and validity of the flag parameters
+                                                      (ARGV[argpos + 1][0] == '0'))) &&
+                                                    (ARGV[argpos + 2] &&
+                                                     ((ARGV[argpos + 2].to_i != 0) ||
+                                                      (ARGV[argpos + 2][0] == '0'))))
+    curr_op.push(ARGV[argpos + 1].to_i)                                                                         # These are for pushing the operations arguments into the array
+    curr_op.push(ARGV[argpos + 2].to_i)
+    nextflag = 3                                                                                                # Determining the theoretical position of the next flag
+  else
+    abort_84 "error: invalid flag arguments" unless (ARGV[argpos + 1] &&
+                                                     ((ARGV[argpos + 1].to_i != 0) ||
+                                                      (ARGV[argpos + 1][0] == '0')))
+    curr_op.push(ARGV[argpos + 1].to_i)
+    nextflag = 2
+  end
+
+  oplist.push(curr_op)                                                                                          # Adding current operation to the operations list
+  oplist = build_oplist (argpos + nextflag), oplist if ARGV[argpos + nextflag]                                  # Recurse until there are no more flags to check, also adding the new operations to the list
+  return oplist
+end
+
+oplist = (build_oplist 2, Array.new)                                                                            # Building the operations list starting at the third argument containing the first flag
+
+# The following parts computes the operations stored in the operations list one by one on a matrix corresponding to the coordinates entered in parameter
+mtx_end = [[0, 1, ARGV[0].to_i],                                                     # Defining the matrix from the base points passed in argument
+           [1, 0, ARGV[1].to_i],
+           [0, 0, 1]]
+x_end = ARGV[0].to_i
+y_end = ARGV[1].to_i
+
+
+oplist.each do |operation|                                                                                      # Do an operation for each element in the operations list
+  case operation[0]                                                                                             # This case control structure is used to determine the operation to do and to display it, then execute it
+  when "-t"
+    puts "Translation by the vector (#{operation[1]}, #{operation[2]})"                                         # Prints the name of the opertions that are done
+    trs_mtx = [operation[1], operation[2], 1]
+    trs_mtx_tmp = Array.new(3) { 0 }
+    
+    (0..mtx_end.size - 1).each do |i|
+      (0..trs_mtx.size - 1).each do |j|
+        trs_mtx_tmp[i] += mtx_end[i][j] * trs_mtx[j]
+      end
+    end
+    mtx_end = [[1, 0, trs_mtx_tmp[0]],
+               [0, 1, trs_mtx_tmp[1]],
+               [0, 0, trs_mtx_tmp[2]]]
+    x_end = x_end + operation[1].to_f
+    y_end = y_end + operation[2].to_f
+  when "-h"
+    puts "Homothety by the ratios #{operation[1]} and #{operation[2]}"
+    
+  when "-r"
+    puts "Rotation at a #{operation[1]} degree angle"
+  ### ROTATION ALGORITHM TO BE WRITTEN
+  when "-s"
+    puts "Symmetry about an axis inclined with an angle of #{operation[1]} degrees"
+  ### SYMMETRY ALGORITHM TO BE WRITTEN
+  end
+end
+
+# The next part is used to display the final results (matrix and position)
+mtx_end.each do |row_i|
+  (0..row_i.length - 1).each do |i|
+    print_and_flush "%.2f" % row_i[i]
+    print_and_flush "\t" if row_i[i + 1]
+  end
+  print_and_flush "\n"
+end
+
+puts "(#{ARGV[0]},#{ARGV[1]}) => (%.2f,%.2f)" % [x_end, y_end]
+
+exit 0
